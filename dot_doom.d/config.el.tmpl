@@ -1,0 +1,309 @@
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets.
+(setq user-full-name "Nick de Heras"
+      user-mail-address "{{ .email }}"
+      org-directory "~/Documents/org/")
+
+;; Increasing line spacing a touch
+;; (setq-default line-spacing 0.1)
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
+;; are the three important ones:
+;;
+;; + `doom-font'
+;; + `doom-variable-pitch-font'
+;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;;
+;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+;; font string. You generally only need these two:
+(setq doom-font (font-spec :family "Source Code Pro" :size 13 :weight 'normal)
+      doom-big-font (font-spec :family "Source Code Pro" :size 16)
+      doom-variable-pitch-font (font-spec :family "IBM Plex Serif" :size 18)
+      ;; doom-unicode-font (font-spec :size 10)
+      doom-serif-font (font-spec :family "IBM Plex Serif" :weight 'light))
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+;; (setq doom-theme 'doom-vibrant)
+;; (setq doom-font (font-spec :family "Source Code Pro" :size 25 :weight 'semi-light)
+;;       doom-variable-pitch-font (font-spec :family "sans" :size 23))
+;; (after! doom-themes
+;;   (setq doom-themes-enable-bold t
+;;         doom-themes-enable-italic t))
+
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(require 'org)
+(require 'org-habit)
+
+(after! org
+  (setq org-startup-indented t
+        org-log-into-drawer t
+        org-blank-before-new-entry '((heading . t) (plain-list-item . 'auto))
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil
+        org-log-refile t
+        org-refile-allow-creating-parent-nodes 'confirm
+        org-log-done 'time
+        org-tags-column -80
+
+        org-agenda-files '("~/Documents/org/gtd/")
+        org-refile-targets (quote ((org-agenda-files :maxlevel . 5)))
+
+        org-highest-priority ?A
+        org-default-priority ?C
+        org-lowest-priority ?D
+
+        org-complete-tags-always-offer-all-agenda-tags t)
+
+  (defvar deheras/org-current-effort "1:00"
+    "Current effort for agenda items.")
+
+  (defun deheras/my-org-agenda-set-effort (effort)
+    "Set the effort property for the current headline."
+    (interactive
+     (list (read-string (format "EFFORT [%s]: " deheras/org-current-effort) nil nil deheras/org-current-effort)))
+    (setq deheras/org-current-effort effort)
+    (org-agenda-check-no-diary)
+    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker) (org-agenda-error)))
+           (buffer (marker-buffer hdmarker))
+           (pos (marker-position hdmarker))
+           (inhibit-read-only t)
+           newhead)
+      (org-with-remote-undo buffer
+        (with-current-buffer buffer
+          (widen)
+          (goto-char pos)
+          (org-show-context 'agenda)
+          (funcall-interactively 'org-set-effort nil deheras/org-current-effort)
+          (end-of-line 1)
+          (setq newhead (org-get-heading)))
+        (org-agenda-change-all-lines newhead hdmarker))))
+
+  ;; Process inbox items
+  (defun deheras/org-agenda-process-inbox-item ()
+    "Process a single item in the org-agenda."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-set-tags)
+     (org-agenda-priority)
+     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-refile nil nil t)))
+
+  (add-hook 'org-agenda-mode-hook (lambda ()
+                                    (define-key org-agenda-mode-map "p" 'deheras/org-agenda-process-inbox-item)))
+
+  (defun deheras/skip-projects ()
+    "Skip trees that are projects"
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+        (cond
+         ((org-is-habit-p)
+          next-headline)
+         ;; ((deheras/is-project-p)
+         ;;  next-headline)
+         (t
+          nil)))))
+
+  ;; https://stackoverflow.com/questions/22394394/orgmode-a-report-of-tasks-that-are-done-within-the-week
+  (setq deheras/org-agenda-review-settings
+        '((org-agenda-files '("~/Documents/org/gtd/projects.org"
+                              "~/Documents/org/gtd/next.org"
+                              ))
+          (org-agenda-show-all-dates t)
+          (org-agenda-start-with-log-mode t)
+          (org-agenda-start-with-clockreport-mode t)
+          ;; (org-agenda-archives-mode t)
+          )
+        )
+
+
+  ;; Habit settings
+  (setq org-habit-graph-column 60)
+
+  ;; Todo settings
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")
+          (sequence "IDEA(i)" "PLANNING(p)" "ACTIVE(a)" "|")))
+  ;; (setq org-todo-keywords
+  ;;       '((sequence "TODO" "NEXT" "WAITING" "SOMEDAY" "|" "DONE" "DELEGATED" "CANCELLED")))
+  (setq org-columns-default-format "%40ITEM(Task) %Effort(EE){:} %CLOCKSUM(Time Spent) %SCHEDULED(Scheduled) %DEADLINE(Deadline)")
+
+  ;; Custom commands
+  (setq org-agenda-custom-commands
+        `(
+          ("d" "Default agenda"
+           ((agenda ""
+                    ((org-agenda-span 'week)
+                     (org-deadline-warning-days 90)))
+            (alltodo ""
+                     ((org-agenda-overriding-header "Inbox")
+                      (org-agenda-files `(,(expand-file-name "gtd/inbox.org" org-directory)))))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "In Progress")
+                   (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "Active Projects")
+                   (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))
+                   (org-agenda-sorting-strategy '(priority-down))
+                   (org-agenda-skip-function #'deheras/skip-projects)))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "One-off Tasks")
+                   (org-agenda-files `(,(expand-file-name "gtd/next.org" org-directory)))))
+            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))
+            (todo "WAITING"
+                  ((org-agenda-overriding-header "Waiting")
+                   (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))))
+            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))
+            ))
+          ("rw" "Weekly review"
+           agenda ""
+           (
+            ;; (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))
+            ;; (org-agenda-log-mode t)
+            (org-agenda-start-with-log-mode t)
+            ;; (org-agenda-clockreport-mode t)
+            (org-agenda-start-with-clockreport-mode t)
+            (org-agenda-log-mode-items '(clock closed))
+            (org-agenda-show-all-dates t)
+            (org-agenda-overriding-header "Week in review")
+            (org-agenda-span 'week)
+            (org-agenda-start-on-weekday 0)
+            )
+           )))
+
+  ;; Weekly review
+  ;; (add-to-list org-agenda-custom-commands
+  ;;              `(("rw" "Weekly review"
+  ;;                 ((agenda ""
+  ;;                          ,(append
+  ;;                            deheras/org-agenda-review-settings
+  ;;                            '((org-agenda-span 'week)
+  ;;                              (org-agenda-start-on-weekday 0)
+  ;;                              (org-agenda-overriding-header "Week in review"))
+  ;;                            )
+  ;;                          )
+  ;;                  )
+  ;;                 )
+  ;;                )
+  ;;              )
+
+  ;; Capture templates
+  (setq org-capture-templates
+        `(("i" "Inbox" entry  (file "gtd/inbox.org")
+           ,(concat "* TODO %?\n"
+                    "/Entered on/ %U"))))
+  ;; ("t" "Todo" entry (file+headline "~/Documents/org/capture.org" "Tasks")
+  ;;  "* TODO %?\n  :DATE_CAPTURED: %U\n  %a" :empty-lines 1))))
+
+  ;; Org Roam
+  (setq org-roam-directory (file-truename "~/Documents/org/roam/"))
+
+  ;; This determines the style of line numbers in effect. If set to `nil', line
+  ;; numbers are disabled. For relative line numbers, set this to `relative'.
+  (setq display-line-numbers-type 'relative)
+
+  ;; Added [2022-02-04 Fri] to address https://github.com/hlissner/doom-emacs/issues/5714
+  (add-hook! 'org-capture-after-finalize-hook (org-element-cache-reset t))
+  (defadvice! dan/+org--restart-mode-h-careful-restart (fn &rest args)
+    :around #'+org--restart-mode-h
+    (let ((old-org-capture-current-plist (and (bound-and-true-p org-capture-mode)
+                                              (bound-and-true-p org-capture-current-plist))))
+      (apply fn args)
+      (when old-org-capture-current-plist
+        (setq-local org-capture-current-plist old-org-capture-current-plist)
+        (org-capture-mode +1)))))
+
+
+(map! :map org-agenda-mode-map
+      "r" #'deheras/org-agenda-process-inbox-item)
+
+(after! org-fancy-priorities
+  (setq org-fancy-priorities-list '((?A . "❗")
+                                    (?B . "⬆")
+                                    (?C . "⬇")
+                                    (?D . "☕"))))
+
+;; Here are some additional functions/macros that could help you configure Doom:
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+
+;; LSP mode config
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\research\\'"))
+
+;; Debugger config
+(after! dap-mode
+
+  ;; For python
+  (setq dap-python-debugger 'debugpy)
+
+  ;; General
+  ;; Open hydra buffer when breakpoint hit
+  (add-hook 'dap-stopped-hook
+            (lambda (arg) (call-interactively #'dap-hydra)))
+
+  ;; Keybindings
+  ;; Taken from https://docs.doomemacs.org/latest/modules/tools/debugger/#keybindings,code-1
+  (map! :map dap-mode-map
+        :leader
+        :prefix ("d" . "dap")
+        ;; basics
+        :desc "dap next"          "n" #'dap-next
+        :desc "dap step in"       "i" #'dap-step-in
+        :desc "dap step out"      "o" #'dap-step-out
+        :desc "dap continue"      "c" #'dap-continue
+        :desc "dap hydra"         "h" #'dap-hydra
+        :desc "dap debug restart" "r" #'dap-debug-restart
+        :desc "dap debug"         "s" #'dap-debug
+
+        ;; debug
+        :prefix ("dd" . "Debug")
+        :desc "dap debug recent"  "r" #'dap-debug-recent
+        :desc "dap debug last"    "l" #'dap-debug-last
+
+        ;; eval
+        :prefix ("de" . "Eval")
+        :desc "eval"                "e" #'dap-eval
+        :desc "eval region"         "r" #'dap-eval-region
+        :desc "eval thing at point" "s" #'dap-eval-thing-at-point
+        :desc "add expression"      "a" #'dap-ui-expressions-add
+        :desc "remove expression"   "d" #'dap-ui-expressions-remove
+
+        :prefix ("db" . "Breakpoint")
+        :desc "dap breakpoint toggle"      "b" #'dap-breakpoint-toggle
+        :desc "dap breakpoint condition"   "c" #'dap-breakpoint-condition
+        :desc "dap breakpoint hit count"   "h" #'dap-breakpoint-hit-condition
+        :desc "dap breakpoint log message" "l" #'dap-breakpoint-log-message))
+;; (require 'dap-python)
+;; (use-package! lsp-jedi
+;;   :ensure t
+;;   :config
+;;   (with-eval-after-load "lsp-mode"
+;;     (add-to-list 'lsp-disabled-clients 'pyls)))
+
+(after! nov
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
