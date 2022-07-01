@@ -304,15 +304,15 @@
 ;;   :config
 ;;   (with-eval-after-load "lsp-mode"
 ;;     (add-to-list 'lsp-disabled-clients 'pyls)))
-(use-package xterm-color
-  :ensure t
-  :init
-  (setq comint-output-filter-functions
-        (remove 'ansi-color-process-output comint-output-filter-functions))
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (add-hook 'comint-preoutput-filter-functions
-                        'xterm-color-filter nil t))))
+;; (use-package xterm-color
+;;   :ensure t
+;;   :init
+;;   (setq comint-output-filter-functions
+;;         (remove 'ansi-color-process-output comint-output-filter-functions))
+;;   (add-hook 'shell-mode-hook
+;;             (lambda ()
+;;               (add-hook 'comint-preoutput-filter-functions
+;;                         'xterm-color-filter nil t))))
 
 (after! nov
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
