@@ -23,17 +23,21 @@ alias zshrc='vim ~/.zshrc'
 alias fresh='exec "$SHELL"'
 alias config='/usr/bin/git --git-dir=$HOME/.myconf/ --work-tree=$HOME'
 
-# Mac stuff
-alias ql='qlmanage -p'
-
 # python
 alias dj='python manage.py'
 alias pipemacs='pip install -r $HOME/.doom.d/requirements-emacs.txt'
 
+# chezmoi
+alias cm='chezmoi'
+
+{{ if eq .chezmoi.os "darwin" }}
+# Mac stuff
+alias ql='qlmanage -p'
+{{ end }}
+
+{{ if (and (eq .hostowner "work") (eq .hosttype "pc")) }}
 # Work stuff
 alias tunnel='~/Documents/projects/ap-advanced-analytics/tools/command-line-utils/ssh-tunnel/ssh_tunnel.sh'
 alias kdrive='open smb://crossix.local/data/'
 alias aarepo='~/Documents/projects/ap-advanced-analytics/'
-
-# chezmoi
-alias cm='chezmoi'
+{{ end }}
