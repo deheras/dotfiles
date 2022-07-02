@@ -26,8 +26,9 @@ alias config='/usr/bin/git --git-dir=$HOME/.myconf/ --work-tree=$HOME'
 # Mac stuff
 alias ql='qlmanage -p'
 
-# Django aliases
+# python
 alias dj='python manage.py'
+alias pipemacs='pip install -r $HOME/.doom.d/requirements-emacs.txt'
 
 # Work stuff
 alias tunnel='~/Documents/projects/ap-advanced-analytics/tools/command-line-utils/ssh-tunnel/ssh_tunnel.sh'
