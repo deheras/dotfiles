@@ -33,3 +33,6 @@ alias dj='python manage.py'
 alias tunnel='~/Documents/projects/ap-advanced-analytics/tools/command-line-utils/ssh-tunnel/ssh_tunnel.sh'
 alias kdrive='open smb://crossix.local/data/'
 alias aarepo='~/Documents/projects/ap-advanced-analytics/'
+
+# chezmoi
+alias cm='chezmoi'
