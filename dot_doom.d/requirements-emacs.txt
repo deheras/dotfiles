@@ -2,3 +2,5 @@ pyright
 black
 flake8
 debugpy
+isort
+ipython
