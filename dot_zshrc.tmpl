@@ -115,35 +115,24 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# EDITOR settings
-export EDITOR='emacsclient'
 
 # Terraform config
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/terraform terraform
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
 # Created by `pipx` on 2021-11-20 22:42:41
 export PATH="$PATH:$HOME/.local/bin"
 
 # Add doom to path
-export PATH="$PATH:$HOME/.emacs.d/bin"
 
 export PATH="$PATH:$HOME/.poetry/bin"
 
 # Set tab for autocompletions
 # bindkey '\t' autosuggest-accept
 
-# export AA_REPO="$HOME/Documents/projects/ap-advanced-analytics"
 export GPG_TTY=$(tty)
 
 export PATH="$PATH:/opt/homebrew/opt/openssl@3/bin"
-
-
-# Racket
-export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
-# export PATH="$PATH:/Applications/Racket\ v8.5/bin"
 
 # Time zsh loading
 # https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/
@@ -152,6 +141,18 @@ timezsh() {
     for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
+{{ if eq .chezmoi.os "darwin" }}
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+{{ end }}
+
+{{ if eq .hosttype "pc" }}
+# Assuming I use emacs on any personal computer
+export EDITOR='emacsclient'
+export PATH="$PATH:$HOME/.emacs.d/bin"
+
+{{ if eq .hostowner "personal" }}
+export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
+{{ end }}
 
 # pyenv config
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
@@ -159,4 +160,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-
+{{ else }}
+export EDITOR='vim'
+{{ end }}
