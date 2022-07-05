@@ -123,12 +123,10 @@ complete -o nospace -C /usr/local/bin/terraform terraform
 # Created by `pipx` on 2021-11-20 22:42:41
 export PATH="$PATH:$HOME/.local/bin"
 
-# Add doom to path
-
 export PATH="$PATH:$HOME/.poetry/bin"
 
 # Set tab for autocompletions
-# bindkey '\t' autosuggest-accept
+bindkey '^ ' autosuggest-accept
 
 export GPG_TTY=$(tty)
 
