@@ -1,6 +1,6 @@
 [user]
 	name = Nick de Heras
 	email = {{ .email }}
-    {{ if eq .hostowner "personal" }}
+    {{ if eq .hosttype "pc" }}
     signingKey = {{ .gitgpg }}
     {{ end }}
