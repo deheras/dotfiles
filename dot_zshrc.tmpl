@@ -14,13 +14,11 @@ export ZSH="$HOME/.oh-my-zsh"
 # ZSH_THEME="robbyrussell"
 # ZSH_THEME="duellj"
 # ZSH_THEME="fino-time"
-if test "$TERM" != "dumb";
-then
-    ZSH_THEME="jonathan"
-else
-    DISABLE_LS_COLORS="true"
-fi
-
+{{ if eq .hosttype "pc" }}
+ZSH_THEME="jonathan"
+{{ else }}
+ZSH_THEME="cloud"
+{{ end }}
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -126,7 +124,7 @@ export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/.poetry/bin"
 
 # Set tab for autocompletions
-bindkey '^ ' autosuggest-accept
+bindkey '^[[Z' autosuggest-accept
 
 export GPG_TTY=$(tty)
 
