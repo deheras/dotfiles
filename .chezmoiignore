@@ -1,0 +1,7 @@
+README.md
+{{- if ne .chezmoi.os "darwin" }}
+Brewfile  # Homebrew bundle only relevant to Macs
+{{- end }}
+{{- if ne .hosttype "pc" }}
+.doom.d*  # Only use emacs on personal machines
+{{- end }}
