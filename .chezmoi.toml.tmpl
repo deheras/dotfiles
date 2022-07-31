@@ -1,0 +1,10 @@
+{{- $email := promptStringOnce . "email" "Email address" -}}
+{{- $hostowner := promptStringOnce . "hostowner" "Machine owner [personal|work]" -}}
+{{- $hosttype := promptStringOnce . "hosttype" "Machine type [pc|server]" -}}
+{{- $gitgpg := promptStringOnce . "gitgpg" "GitHub GPG signing key" -}}
+
+[data]
+    email = {{ $email | quote }}
+    hostowner = {{ $hostowner | quote }}
+    hosttype = {{ $hosttype | quote }}
+    gitgpg = {{ $gitgpg | quote }}
