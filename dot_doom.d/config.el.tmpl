@@ -1,4 +1,4 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+;;; $DOOMDIR/config.el -*- mode: emacs-lisp; lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -94,9 +94,9 @@
     "Process a single item in the org-agenda."
     (interactive)
     (org-with-wide-buffer
-     (org-agenda-set-tags)
      (org-agenda-priority)
      (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
   (add-hook 'org-agenda-mode-hook (lambda ()
@@ -312,3 +312,7 @@
 
 (after! nov
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+
+;; Vterm
+(after! vterm
+  vterm-always-compile-module t)
