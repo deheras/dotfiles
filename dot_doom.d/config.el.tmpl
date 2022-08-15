@@ -38,7 +38,18 @@
 ;;         doom-themes-enable-italic t))
 
 ;; General stuff
+;; Turn off mouse highlighting. Super annoying in agenda and I don't
+;; need it anyway.
 (setq mouse-highlight nil)
+;; Remove all existing file notification watches from Emacs. This
+;; happens at some point when I've been running emacs for a while, and
+;; moreso when I'm using the dap debugger.
+(defun deheras/file-notify-rm-all-watches ()
+  (interactive)
+  (maphash
+   (lambda (key _value)
+     (file-notify-rm-watch key))
+   file-notify-descriptors))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
