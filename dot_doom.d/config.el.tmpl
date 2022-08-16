@@ -327,3 +327,13 @@
 ;; Vterm
 (after! vterm
   vterm-always-compile-module t)
+
+(after! multi-vterm
+  (defun deheras/multi-vterm-named (name)
+    (interactive "sVterm buffer name: ")
+    (require 'multi-vterm)
+    (command-execute 'multi-vterm)
+    (rename-buffer (concat "*vterminal:" name "*")))
+  (map! :leader
+        :prefix ("o" . "open")
+        :desc "New named multi-vterm terminal" "v" #'deheras/multi-vterm-named))
