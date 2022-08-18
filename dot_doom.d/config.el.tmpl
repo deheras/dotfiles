@@ -101,7 +101,7 @@
         (org-agenda-change-all-lines newhead hdmarker))))
 
   ;; Process inbox items
-  (defun deheras/org-agenda-process-inbox-item ()
+  (defun deheras/org-agenda-process-inbox-default ()
     "Process a single item in the org-agenda."
     (interactive)
     (org-with-wide-buffer
@@ -110,8 +110,21 @@
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
-  (add-hook 'org-agenda-mode-hook (lambda ()
-                                    (define-key org-agenda-mode-map "p" 'deheras/org-agenda-process-inbox-item)))
+  (defun deheras/org-agenda-process-inbox-repeater ()
+    "Process an inbox item destined to be a repeater"
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-priority C)
+     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-set-tags)
+     (org-agenda-schedule)
+     (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
+
+  (map! :map org-agenda-mode-map
+        :leader
+        :prefix ("mi" . "Process inbox")
+        :desc "Default process item" "d" #'deheras/org-agenda-process-inbox-default
+        :desc "Process repeater"     "r" #'deheras/org-agenda-process-inbox-repeater)
 
   (defun deheras/skip-projects ()
     "Skip trees that are projects"
@@ -129,15 +142,13 @@
   ;; https://stackoverflow.com/questions/22394394/orgmode-a-report-of-tasks-that-are-done-within-the-week
   (setq deheras/org-agenda-review-settings
         '((org-agenda-files '("~/Documents/org/gtd/projects.org"
-                              "~/Documents/org/gtd/next.org"
-                              ))
+                              "~/Documents/org/gtd/next.org"))
           (org-agenda-show-all-dates t)
           (org-agenda-start-with-log-mode t)
           (org-agenda-start-with-clockreport-mode t)
           ;; (org-agenda-archives-mode t)
           )
         )
-
 
   ;; Habit settings
   (setq org-habit-graph-column 60)
@@ -234,11 +245,10 @@
       (apply fn args)
       (when old-org-capture-current-plist
         (setq-local org-capture-current-plist old-org-capture-current-plist)
-        (org-capture-mode +1)))))
+        (org-capture-mode +1))))
 
+  )
 
-(map! :map org-agenda-mode-map
-      "r" #'deheras/org-agenda-process-inbox-item)
 
 (after! org-fancy-priorities
   (setq org-fancy-priorities-list '((?A . "❗")
@@ -330,6 +340,7 @@
 
 (after! multi-vterm
   (defun deheras/multi-vterm-named (name)
+    "Create new multi-vterm buffer with user-defined name"
     (interactive "sVterm buffer name: ")
     (require 'multi-vterm)
     (command-execute 'multi-vterm)
