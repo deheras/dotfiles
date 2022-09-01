@@ -1,4 +1,4 @@
-;;; init.el -*- lexical-binding: t; -*-
+;;; $DOOMDIR/init.el -*- mode: emacs-lisp; lexical-binding: t; -*-
 
 ;; This file controls what Doom modules are enabled and what order they load
 ;; in. Remember to run 'doom sync' after modifying it!
@@ -24,7 +24,7 @@
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-       vertico           ; the search engine of the future
+       (vertico +icons +orderless)
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -157,7 +157,9 @@
        ;;purescript        ; javascript, but functional
        (python +lsp +pyright +pyenv +poetry +tree-sitter)            ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
+       {{- if eq .hostowner "personal" }}
        (racket +lsp)            ; a DSL for DSLs
+       {{ end }}
        ;;raku              ; the artist formerly known as perl6
        ;;rest              ; Emacs as a REST client
        ;;rst               ; ReST in peace
@@ -190,3 +192,11 @@
        :config
        ;;literate
        (default +bindings +smartparens))
+
+(after! comp
+  ;; HACK Disable native-compilation for some troublesome packages
+  (mapc (doom-partial #'add-to-list 'native-comp-deferred-compilation-deny-list)
+        (list "/emacs-jupyter.*\\.el\\'"
+              "/evil-collection-vterm\\.el\\'"
+              "/vterm\\.el\\'"
+              "/with-editor\\.el\\'")))
