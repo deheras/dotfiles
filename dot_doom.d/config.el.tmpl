@@ -41,9 +41,18 @@
 ;; Turn off mouse highlighting. Super annoying in agenda and I don't
 ;; need it anyway.
 (setq mouse-highlight nil)
+
+;; Enable modeline for all but minibuffer
+;; https://github.com/doomemacs/doomemacs/issues/6209
+;; (add-hook 'buffer-list-update-hook (lambda ()
+;;                                      (unless (active-minibuffer-window)
+;;                                        (setq hide-mode-line-mode nil))))
+(advice-add 'hide-mode-line-mode :around (lambda (orig &optional args) nil))
+
 ;; Remove all existing file notification watches from Emacs. This
 ;; happens at some point when I've been running emacs for a while, and
-;; moreso when I'm using the dap debugger.
+;; moreso when I'm using the dap debugger. S/o Ben Simon:
+;; https://www.blogbyben.com/2022/05/gotcha-emacs-on-mac-os-too-many-files.html
 (defun deheras/file-notify-rm-all-watches ()
   (interactive)
   (maphash
@@ -278,12 +287,12 @@
 (after! dap-mode
 
   ;; For python
-  (setq dap-python-debugger 'debugpy)
+  (setq dap-python-debugger 'debugpy))
 
   ;; General
   ;; Open hydra buffer when breakpoint hit
-  (add-hook 'dap-stopped-hook
-            (lambda (arg) (call-interactively #'dap-hydra))))
+  ;; (add-hook 'dap-stopped-hook
+  ;;           (lambda (arg) (call-interactively #'dap-hydra)))
 
 ;; Keybindings
 ;; Taken from https://docs.doomemacs.org/latest/modules/tools/debugger/#keybindings,code-1
@@ -298,6 +307,7 @@
       :desc "dap hydra"         "h" #'dap-hydra
       :desc "dap debug restart" "r" #'dap-debug-restart
       :desc "dap debug"         "s" #'dap-debug
+      :desc "dap repl"          "t" #'dap-ui-repl
 
       ;; debug
       :prefix ("dd" . "Debug")
@@ -345,6 +355,14 @@
   (map! :leader
         :prefix ("o" . "open")
         :desc "New named multi-vterm terminal" "v" #'deheras/multi-vterm-named))
+
+(after! doom-modeline
+  ;; Scaling adjustments to help avoid cutting off so much of the
+  ;; right side
+  (setq all-the-icons-scale-factor 1.0)
+  (custom-set-faces!
+    '(model-line :family "Source Code Pro" :size 10)
+    '(model-line-inactive :family "Source Code Pro" :size 10)))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
