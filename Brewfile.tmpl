@@ -4,9 +4,11 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
+{{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
 tap "ngrok/ngrok"
 tap "railwaycat/emacsmacport"
 tap "twilio/brew"
+{{- end}}
 
 # Packages
 brew "bat"
@@ -47,9 +49,13 @@ brew "railwaycat/emacsmacport/emacs-mac", args: ["with-native-comp", "without-mo
 {{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
 brew "minimal-racket"
 brew "twilio/brew/twilio"
+{{ else if eq .hostowner "work" }}
+brew "gimme-aws-creds"
 {{- end }}
 
 # Casks
 cask "font-ibm-plex-serif"
 cask "font-source-code-pro"
+{{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
 cask "ngrok"
+{{- end}}
