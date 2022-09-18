@@ -1,3 +1,4 @@
+# -*- mode: sh -*-
 # ZSH profiling support
 zmodload zsh/zprof
 
@@ -137,18 +138,19 @@ timezsh() {
     for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
-{{ if eq .chezmoi.os "darwin" }}
+{{- if eq .chezmoi.os "darwin" }}
+# macOS-only stuff
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-{{ end }}
+. ${HOMEBREW_PREFIX}/etc/profile.d/z.sh
+{{- if eq .hostowner "personal" }}
+export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
+{{- end }}
+{{- end }}
 
-{{ if eq .hosttype "pc" }}
+{{- if eq .hosttype "pc" }}
 # Assuming I use emacs on any personal computer
 export EDITOR='emacsclient'
 export PATH="$PATH:$HOME/.emacs.d/bin"
-
-{{ if eq .hostowner "personal" }}
-export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
-{{ end }}
 
 # pyenv config
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
@@ -156,6 +158,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-{{ else }}
+{{- else }}
 export EDITOR='vim'
-{{ end }}
+{{- end }}
