@@ -114,7 +114,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
 # Terraform config
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/terraform terraform
@@ -129,8 +128,6 @@ bindkey '^[[Z' autosuggest-accept
 
 export GPG_TTY=$(tty)
 
-export PATH="$PATH:/opt/homebrew/opt/openssl@3/bin"
-
 # Time zsh loading
 # https://blog.mattclemente.com/2020/06/26/oh-my-zsh-slow-to-load/
 timezsh() {
@@ -140,6 +137,8 @@ timezsh() {
 
 {{- if eq .chezmoi.os "darwin" }}
 # macOS-only stuff
+eval "$(brew shellenv)"
+export PATH="$PATH:${HOMEBREW_PREFIX}/opt/openssl@3/bin"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 . ${HOMEBREW_PREFIX}/etc/profile.d/z.sh
 {{- if eq .hostowner "personal" }}
