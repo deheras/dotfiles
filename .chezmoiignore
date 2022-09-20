@@ -5,4 +5,3 @@ Brewfile  # Homebrew bundle only relevant to Macs
 {{- if ne .hosttype "pc" }}
 .doom.d*  # Only use emacs on personal machines
 {{- end }}
-com.googlecode.iterm2.plist
