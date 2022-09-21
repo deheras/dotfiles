@@ -76,7 +76,7 @@
         org-log-done 'time
         org-tags-column -80
 
-        org-agenda-files '((concat(org-directory "gtd/"))
+        org-agenda-files `(,(concat org-directory "gtd/"))
         org-refile-targets '((org-agenda-files :maxlevel . 5))
 
         org-highest-priority ?A
@@ -148,8 +148,8 @@
 
   ;; https://stackoverflow.com/questions/22394394/orgmode-a-report-of-tasks-that-are-done-within-the-week
   (setq deheras/org-agenda-review-settings
-        '((org-agenda-files '((concat org-agenda-files "projects.org")
-                              (concat org-agenda-files "next.org")))
+        '((org-agenda-files `(,(concat org-agenda-files "projects.org")
+                              ,(concat org-agenda-files "next.org")))
           (org-agenda-show-all-dates t)
           (org-agenda-start-with-log-mode t)
           (org-agenda-start-with-clockreport-mode t)
