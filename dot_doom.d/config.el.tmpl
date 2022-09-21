@@ -8,7 +8,7 @@
 ;; clients, file templates and snippets.
 (setq user-full-name "Nick de Heras"
       user-mail-address "{{ .email }}"
-      org-directory "~/Documents/org/")
+      org-directory (file-truename "~/Documents/org/"))
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -76,7 +76,7 @@
         org-log-done 'time
         org-tags-column -80
 
-        org-agenda-files '("~/Documents/org/gtd/")
+        org-agenda-files '((concat(org-directory "gtd/"))
         org-refile-targets '((org-agenda-files :maxlevel . 5))
 
         org-highest-priority ?A
@@ -148,8 +148,8 @@
 
   ;; https://stackoverflow.com/questions/22394394/orgmode-a-report-of-tasks-that-are-done-within-the-week
   (setq deheras/org-agenda-review-settings
-        '((org-agenda-files '("~/Documents/org/gtd/projects.org"
-                              "~/Documents/org/gtd/next.org"))
+        '((org-agenda-files '((concat org-agenda-files "projects.org")
+                              (concat org-agenda-files "next.org")))
           (org-agenda-show-all-dates t)
           (org-agenda-start-with-log-mode t)
           (org-agenda-start-with-clockreport-mode t)
@@ -230,14 +230,22 @@
 
   ;; Capture templates
   (setq org-capture-templates
-        `(("i" "Inbox" entry  (file "gtd/inbox.org")
+        `(("t" "Todo" entry (file "gtd/inbox.org")
            ,(concat "* TODO %?\n"
-                    "/Entered on/ %U"))))
+                    "/Entered on/ %U"))
+          ("i" "Inbox" entry (file "inbox.org")
+           ,(concat "* %?\n"
+                    "/Entered on/ %U"))
+          ("c" "With context" entry (file "inbox.org")
+           ,(concat "* %?\n"
+                    "/Entered on/ %U\n"
+                    "  %i\n"
+                    "%a"))))
   ;; ("t" "Todo" entry (file+headline "~/Documents/org/capture.org" "Tasks")
   ;;  "* TODO %?\n  :DATE_CAPTURED: %U\n  %a" :empty-lines 1))))
 
   ;; Org Roam
-  (setq org-roam-directory (file-truename "~/Documents/org/roam/"))
+  (setq org-roam-directory (concat org-directory "roam/"))
 
   ;; This determines the style of line numbers in effect. If set to `nil', line
   ;; numbers are disabled. For relative line numbers, set this to `relative'.
