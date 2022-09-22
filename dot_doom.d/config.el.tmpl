@@ -129,7 +129,18 @@
      (org-agenda-schedule)
      (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
 
+  (defun deheras/org-agenda-process-inbox-gtd-task ()
+    "Process a single item in the org-agenda."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-priority)
+     (org-agenda-todo)
+     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-set-tags)
+     (org-agenda-refile nil nil t)))
+
   (map! :map org-agenda-mode-map
+        :mn "SPC m i g d" #'deheras/org-agenda-process-inbox-gtd-task
         :mn "SPC m i d" #'deheras/org-agenda-process-inbox-default
         :mn "SPC m i r" #'deheras/org-agenda-process-inbox-repeater)
 
