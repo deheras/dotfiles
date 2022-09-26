@@ -76,7 +76,7 @@
         org-log-done 'time
         org-tags-column -80
 
-        org-agenda-files `(,(concat org-directory "gtd/"))
+        org-agenda-files (--map (concat org-directory it) '("gtd/" "inbox.org" "bookmarks.org" "runbooks.org"))
         org-refile-targets '((org-agenda-files :maxlevel . 5))
 
         org-highest-priority ?A
@@ -109,25 +109,15 @@
           (setq newhead (org-get-heading)))
         (org-agenda-change-all-lines newhead hdmarker))))
 
-  ;; Process inbox items
-  (defun deheras/org-agenda-process-inbox-default ()
-    "Process a single item in the org-agenda."
-    (interactive)
-    (org-with-wide-buffer
-     (org-agenda-priority)
-     (call-interactively 'deheras/my-org-agenda-set-effort)
-     (org-agenda-set-tags)
-     (org-agenda-refile nil nil t)))
-
-  (defun deheras/org-agenda-process-inbox-repeater ()
-    "Process an inbox item destined to be a repeater"
-    (interactive)
-    (org-with-wide-buffer
-     (org-agenda-priority C)
-     (call-interactively 'deheras/my-org-agenda-set-effort)
-     (org-agenda-set-tags)
-     (org-agenda-schedule)
-     (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
+  ;; (defun deheras/org-agenda-process-inbox-repeater ()
+  ;;   "Process an inbox item destined to be a repeater"
+  ;;   (interactive)
+  ;;   (org-with-wide-buffer
+  ;;    (org-agenda-priority C)
+  ;;    (call-interactively 'deheras/my-org-agenda-set-effort)
+  ;;    (org-agenda-set-tags)
+  ;;    (org-agenda-schedule)
+  ;;    (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
 
   (defun deheras/org-agenda-process-inbox-gtd-task ()
     "Process a single item in the org-agenda."
@@ -139,10 +129,20 @@
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
+  (defun deheras/org-agenda-process-inbox-bookmark ()
+    "Create bookmark from inbox item"
+    (interactive)
+    (org-agenda-open-link)
+    (org-with-wide-buffer
+     (org-agenda-set-property)  ;; set title
+     (org-agenda-set-property)  ;; set description
+     (org-agenda-set-property)  ;; set type TEXT/VIDEO/AUDIO
+     (org-agenda-set-tags)
+     (org-agenda-refile nil nil t)))
+
   (map! :map org-agenda-mode-map
         :mn "SPC m i g d" #'deheras/org-agenda-process-inbox-gtd-task
-        :mn "SPC m i d" #'deheras/org-agenda-process-inbox-default
-        :mn "SPC m i r" #'deheras/org-agenda-process-inbox-repeater)
+        :mn "SPC m i b" #'deheras/org-agenda-process-inbox-bookmark)
 
   (defun deheras/skip-projects ()
     "Skip trees that are projects"
@@ -185,11 +185,12 @@
         `(
           ("d" "Default agenda"
            ((agenda ""
-                    ((org-agenda-span 'week)
+                    ((org-agenda-span 7)
+                     (org-agenda-start-day "-0d")
                      (org-deadline-warning-days 90)))
-            (alltodo ""
+            (tags "inbox"
                      ((org-agenda-overriding-header "Inbox")
-                      (org-agenda-files `(,(expand-file-name "gtd/inbox.org" org-directory)))))
+                      (org-agenda-files `(,(expand-file-name "inbox.org" org-directory)))))
             (todo "NEXT"
                   ((org-agenda-overriding-header "In Progress")
                    (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))))
@@ -241,10 +242,7 @@
 
   ;; Capture templates
   (setq org-capture-templates
-        `(("t" "Todo" entry (file "gtd/inbox.org")
-           ,(concat "* TODO %?\n"
-                    "/Entered on/ %U"))
-          ("i" "Inbox" entry (file "inbox.org")
+        `(("i" "Inbox" entry (file "inbox.org")
            ,(concat "* %?\n"
                     "/Entered on/ %U"))
           ("c" "With context" entry (file "inbox.org")
