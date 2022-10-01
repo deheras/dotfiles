@@ -360,16 +360,15 @@
 (after! vterm
   vterm-always-compile-module t)
 
-(after! multi-vterm
-  (defun deheras/multi-vterm-named (name)
-    "Create new multi-vterm buffer with user-defined name"
-    (interactive "sVterm buffer name: ")
-    (require 'multi-vterm)
-    (command-execute 'multi-vterm)
-    (rename-buffer (concat "*vterminal:" name "*")))
-  (map! :leader
-        :prefix ("o" . "open")
-        :desc "New named multi-vterm terminal" "v" #'deheras/multi-vterm-named))
+(defun deheras/multi-vterm-named (name)
+  "Create new multi-vterm buffer with user-defined name"
+  (interactive "sVterm buffer name: ")
+  (require 'multi-vterm)
+  (command-execute 'multi-vterm)
+  (rename-buffer (concat "*vterminal:" name "*")))
+(map! :leader
+      :prefix ("o" . "open")
+      :desc "New named multi-vterm terminal" "v" #'deheras/multi-vterm-named)
 
 (after! doom-modeline
   ;; Scaling adjustments to help avoid cutting off so much of the
@@ -378,6 +377,12 @@
   (custom-set-faces!
     '(model-line :family "Source Code Pro" :size 10)
     '(model-line-inactive :family "Source Code Pro" :size 10)))
+
+(after! company
+  (setq company-idle-delay 1.0))
+
+(setq +notmuch-home-function (lambda () (notmuch-search "tag:inbox")))
+(setq +notmuch-sync-backend (concat "cd " +notmuch-mail-folder " && notmuch new"))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
