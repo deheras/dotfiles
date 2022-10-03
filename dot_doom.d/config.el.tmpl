@@ -141,8 +141,13 @@
      (org-agenda-refile nil nil t)))
 
   (map! :map org-agenda-mode-map
-        :mn "SPC m i g d" #'deheras/org-agenda-process-inbox-gtd-task
-        :mn "SPC m i b" #'deheras/org-agenda-process-inbox-bookmark)
+        :localleader
+        (:prefix ("i" . "inbox")
+         :desc "bookmark"
+         :mn "b" #'deheras/org-agenda-process-inbox-bookmark)
+        (:prefix ("ig" . "gtd")
+         :desc "gtd task"
+         :mn "t" #'deheras/org-agenda-process-inbox-gtd-task))
 
   (defun deheras/skip-projects ()
     "Skip trees that are projects"
@@ -383,6 +388,15 @@
 
 (setq +notmuch-home-function (lambda () (notmuch-search "tag:inbox")))
 (setq +notmuch-sync-backend (concat "cd " +notmuch-mail-folder " && notmuch new"))
+
+;; Patch for geiser regression (2022-10-01)
+;; https://github.com/emacsmirror/geiser/blob/486c39cfbdf1789fe493535b7e0ae72ff518e53e/elisp/geiser-repl.el
+(define-obsolete-function-alias 'run-geiser 'geiser "Geiser 0.26")
+
+;; docker stuff
+(after! docker
+  ;; Associate Containerfile as Dockerfile
+  (add-to-list 'auto-mode-alist '("/Containerfile\\(?:\\.[^/\\]*\\)?\\'" . dockerfile-mode)))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
