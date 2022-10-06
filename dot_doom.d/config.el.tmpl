@@ -76,7 +76,7 @@
         org-log-done 'time
         org-tags-column -80
 
-        org-agenda-files (--map (concat org-directory it) '("gtd/" "inbox.org" "bookmarks.org" "runbooks.org"))
+        org-agenda-files (--map (concat org-directory it) '("gtd/" "inbox/" "bookmarks.org" "runbooks.org" "ideas.org"))
         org-refile-targets '((org-agenda-files :maxlevel . 5))
 
         org-highest-priority ?A
@@ -123,11 +123,20 @@
     "Process a single item in the org-agenda."
     (interactive)
     (org-with-wide-buffer
+     (org-agenda-todo "TODO")
      (org-agenda-priority)
-     (org-agenda-todo)
      (call-interactively 'deheras/my-org-agenda-set-effort)
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
+
+  (defun deheras/org-agenda-process-inbox-gtd-idea ()
+    "Process a project inbox entry."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-todo "IDEA")
+     (org-agenda-priority ?D)
+     (org-agenda-set-tags)
+     (org-agenda-refile nil `("projects.org" ,(concat org-directory "gtd/projects.org") nil) t)))
 
   (defun deheras/org-agenda-process-inbox-bookmark ()
     "Create bookmark from inbox item"
@@ -147,7 +156,10 @@
          :mn "b" #'deheras/org-agenda-process-inbox-bookmark)
         (:prefix ("ig" . "gtd")
          :desc "gtd task"
-         :mn "t" #'deheras/org-agenda-process-inbox-gtd-task))
+         :mn "t" #'deheras/org-agenda-process-inbox-gtd-task)
+        (:prefix ("ig" . "gtd")
+         :desc "gtd idea"
+         :mn "i" #'deheras/org-agenda-process-inbox-gtd-idea))
 
   (defun deheras/skip-projects ()
     "Skip trees that are projects"
@@ -195,7 +207,7 @@
                      (org-deadline-warning-days 90)))
             (tags "inbox"
                      ((org-agenda-overriding-header "Inbox")
-                      (org-agenda-files `(,(expand-file-name "inbox.org" org-directory)))))
+                      (org-agenda-files `(,(expand-file-name "inbox/" org-directory)))))
             (todo "NEXT"
                   ((org-agenda-overriding-header "In Progress")
                    (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))))
@@ -247,12 +259,12 @@
 
   ;; Capture templates
   (setq org-capture-templates
-        `(("i" "Inbox" entry (file "inbox.org")
+        `(("i" "Inbox" entry (file "inbox/{{ .chezmoi.hostname }}.org")
            ,(concat "* %?\n"
-                    "/Entered on/ %U"))
-          ("c" "With context" entry (file "inbox.org")
+                    "/Entered from {{ .chezmoi.hostname }} on/ %U"))
+          ("c" "With context" entry (file "inbox/{{ .chezmoi.hostname }}.org")
            ,(concat "* %?\n"
-                    "/Entered on/ %U\n"
+                    "/Entered from {{ .chezmoi.hostname }} on/ %U\n"
                     "  %i\n"
                     "%a"))))
   ;; ("t" "Todo" entry (file+headline "~/Documents/org/capture.org" "Tasks")

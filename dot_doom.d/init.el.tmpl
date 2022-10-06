@@ -97,7 +97,10 @@
        (notmuch +org)
 
        :app
+       {{- if eq .hostowner "personal" }}
        (rss +org)
+       irc
+       {{- end }}
 
        :config
        ;;literate
