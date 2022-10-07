@@ -119,12 +119,34 @@
   ;;    (org-agenda-schedule)
   ;;    (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
 
-  (defun deheras/org-agenda-process-inbox-gtd-task ()
+  (defun deheras/org-agenda-process-inbox-gtd-todo ()
     "Process a single item in the org-agenda."
     (interactive)
     (org-with-wide-buffer
      (org-agenda-todo "TODO")
      (org-agenda-priority)
+     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-set-tags)
+     (org-agenda-refile nil nil t)))
+
+  (defun deheras/org-agenda-process-inbox-gtd-scheduled-todo ()
+    "Process a single item in the org-agenda."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-todo "TODO")
+     (org-agenda-priority)
+     (org-agenda-schedule nil)
+     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (org-agenda-set-tags)
+     (org-agenda-refile nil nil t)))
+
+  (defun deheras/org-agenda-process-inbox-gtd-deadline-todo ()
+    "Process a single item in the org-agenda."
+    (interactive)
+    (org-with-wide-buffer
+     (org-agenda-todo "TODO")
+     (org-agenda-priority)
+     (org-agenda-deadline nil)
      (call-interactively 'deheras/my-org-agenda-set-effort)
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
@@ -151,12 +173,23 @@
 
   (map! :map org-agenda-mode-map
         :localleader
+
         (:prefix ("i" . "inbox")
          :desc "bookmark"
          :mn "b" #'deheras/org-agenda-process-inbox-bookmark)
+
         (:prefix ("ig" . "gtd")
-         :desc "gtd task"
-         :mn "t" #'deheras/org-agenda-process-inbox-gtd-task)
+         :desc "gtd todo"
+         :mn "t" #'deheras/org-agenda-process-inbox-gtd-todo)
+
+        (:prefix ("ig" . "gtd")
+         :desc "gtd scheduled todo"
+         :mn "s" #'deheras/org-agenda-process-inbox-gtd-scheduled-todo)
+
+        (:prefix ("ig" . "gtd")
+         :desc "gtd deadline todo"
+         :mn "d" #'deheras/org-agenda-process-inbox-gtd-deadline-todo)
+
         (:prefix ("ig" . "gtd")
          :desc "gtd idea"
          :mn "i" #'deheras/org-agenda-process-inbox-gtd-idea))
