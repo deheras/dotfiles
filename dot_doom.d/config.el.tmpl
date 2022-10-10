@@ -83,41 +83,95 @@
         org-default-priority ?C
         org-lowest-priority ?D
 
-        org-complete-tags-always-offer-all-agenda-tags t)
+        org-complete-tags-always-offer-all-agenda-tags t
 
-  (defvar deheras/org-current-effort "1:00"
-    "Current effort for agenda items.")
+        org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00 12:00")))
 
-  (defun deheras/my-org-agenda-set-effort (effort)
-    "Set the effort property for the current headline."
-    (interactive
-     (list (read-string (format "EFFORT [%s]: " deheras/org-current-effort) nil nil deheras/org-current-effort)))
-    (setq deheras/org-current-effort effort)
+  (defun deheras/org-copy-link (&optional arg)
+    "Extract URL from org-mode-link add add to kill ring.
+Cribbed from:
+https://emacs.stackexchange.com/questions/3981/how-to-copy-links-out-of-org-mode"
+    (interactive "P")
+    (let* ((link (org-element-lineage (org-element-context) '(link) t))
+           (type (org-element-property :type link))
+           (url (org-element-property :path link))
+           (url (concat type ":" url)))
+      (kill-new url)
+      (message (concat "Copied URL: " url))))
+
+  (defun deheras/org-agenda-copy-link (&optional arg)
+    "Open the link(s) in the current entry, if any.
+
+This looks for a link in the displayed line in the agenda.
+It also looks at the text of the entry itself."
+    (interactive "P")
+    (let* ((marker (or (org-get-at-bol 'org-hd-marker)
+                       (org-get-at-bol 'org-marker)))
+           (buffer (and marker (marker-buffer marker)))
+           (prefix (buffer-substring (line-beginning-position) (line-end-position)))
+           (lkall (and buffer (org-offer-links-in-entry
+                               buffer marker arg prefix)))
+           (lk0 (car lkall))
+           (lk (if (stringp lk0) (list lk0) lk0))
+           (lkend (cdr lkall))
+           (trg (substring-no-properties lk0)))
+      trg))
+
+  (defun deheras/org-get-bookmark-title-slug (title)
+    "Get bookmark title slug."
+    (setq title-regex '(("[^A-Za-z0-9 ]" "") (" +" "_")))
+    (downcase (--reduce-from (replace-regexp-in-string (nth 0 it) (nth 1 it) acc) title title-regex)))
+
+  (defun deheras/org-agenda-set-property (property value)
+    "Set a property for the current headline."
+    (interactive "sproperty: \nsvalue: \n")
     (org-agenda-check-no-diary)
-    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker) (org-agenda-error)))
+    (let* ((hdmarker (or (org-get-at-bol 'org-hd-marker)
+                         (org-agenda-error)))
            (buffer (marker-buffer hdmarker))
            (pos (marker-position hdmarker))
-           (inhibit-read-only t)
-           newhead)
+           (inhibit-read-only t))
       (org-with-remote-undo buffer
         (with-current-buffer buffer
           (widen)
           (goto-char pos)
-          (org-show-context 'agenda)
-          (funcall-interactively 'org-set-effort nil deheras/org-current-effort)
-          (end-of-line 1)
-          (setq newhead (org-get-heading)))
-        (org-agenda-change-all-lines newhead hdmarker))))
+          (org-fold-show-context 'agenda)
+          (funcall-interactively 'org-set-property property value)))))
 
-  ;; (defun deheras/org-agenda-process-inbox-repeater ()
-  ;;   "Process an inbox item destined to be a repeater"
-  ;;   (interactive)
-  ;;   (org-with-wide-buffer
-  ;;    (org-agenda-priority C)
-  ;;    (call-interactively 'deheras/my-org-agenda-set-effort)
-  ;;    (org-agenda-set-tags)
-  ;;    (org-agenda-schedule)
-  ;;    (org-agenda-refile (expand-file-name "gtd/repeaters.org" org-directory))))
+
+  (defun deheras/org-agenda-process-inbox-bookmark ()
+    "Create bookmark from inbox item."
+    (interactive)
+    (org-agenda-open-link)
+    (let* ((title (read-string "Title: "))
+           (description (read-string "Description: "))
+           (type-options '("text" "audio" "video" "site"))
+           (type (completing-read "Media type: " type-options))
+           (link (call-interactively 'deheras/org-agenda-copy-link))
+           (slug (deheras/org-get-bookmark-title-slug title))
+           (path (concat (file-truename "~/Documents/literature/articles/") slug "-" (format-time-string "%Y%m%d%H%M%S") ".pdf"))
+           (cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" link path)))
+      (org-with-wide-buffer
+       (with-current-buffer (compile cmd)
+         (add-hook
+          'compilation-finish-functions
+          (lambda (buf status)
+            (if (equal status "finished\n")
+                (progn
+                  (delete-windows-on buf)
+                  (bury-buffer buf)
+                  (message (concat "Successfully saved to " path)))
+              (user-error (concat "Failed to save " path))))
+          nil
+          'local))
+       (deheras/org-agenda-set-property "BM_TITLE" title)
+       (deheras/org-agenda-set-property "BM_MEDIA_TYPE" type)
+       (deheras/org-agenda-set-property "BM_DESCRIPTION" description)
+       (deheras/org-agenda-set-property "BM_URL" link)
+       (deheras/org-agenda-set-property "BM_FILE" (concat "file:" path))
+       (deheras/org-agenda-set-property "BM_DATE_ADDED" (format-time-string "[%Y-%m-%d %a %H:%M]"))
+       (org-agenda-set-tags)
+       (org-agenda-refile nil `("bookmarks.org" ,(concat org-directory "bookmarks.org") nil) t))))
 
   (defun deheras/org-agenda-process-inbox-gtd-todo ()
     "Process a single item in the org-agenda."
@@ -125,7 +179,7 @@
     (org-with-wide-buffer
      (org-agenda-todo "TODO")
      (org-agenda-priority)
-     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (call-interactively 'org-agenda-set-effort)
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
@@ -136,7 +190,7 @@
      (org-agenda-todo "TODO")
      (org-agenda-priority)
      (org-agenda-schedule nil)
-     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (call-interactively 'org-agenda-set-effort)
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
@@ -147,7 +201,7 @@
      (org-agenda-todo "TODO")
      (org-agenda-priority)
      (org-agenda-deadline nil)
-     (call-interactively 'deheras/my-org-agenda-set-effort)
+     (call-interactively 'org-agenda-set-effort)
      (org-agenda-set-tags)
      (org-agenda-refile nil nil t)))
 
@@ -159,17 +213,6 @@
      (org-agenda-priority ?D)
      (org-agenda-set-tags)
      (org-agenda-refile nil `("projects.org" ,(concat org-directory "gtd/projects.org") nil) t)))
-
-  (defun deheras/org-agenda-process-inbox-bookmark ()
-    "Create bookmark from inbox item"
-    (interactive)
-    (org-agenda-open-link)
-    (org-with-wide-buffer
-     (org-agenda-set-property)  ;; set title
-     (org-agenda-set-property)  ;; set description
-     (org-agenda-set-property)  ;; set type TEXT/VIDEO/AUDIO
-     (org-agenda-set-tags)
-     (org-agenda-refile nil nil t)))
 
   (map! :map org-agenda-mode-map
         :localleader
