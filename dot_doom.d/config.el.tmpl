@@ -337,12 +337,12 @@ It also looks at the text of the entry itself."
 
   ;; Capture templates
   (setq org-capture-templates
-        `(("i" "Inbox" entry (file "inbox/{{ .chezmoi.hostname }}.org")
+        `(("i" "Inbox" entry (file "inbox/{{ .computername }}.org")
            ,(concat "* %?\n"
-                    "/Entered from {{ .chezmoi.hostname }} on/ %U"))
-          ("c" "With context" entry (file "inbox/{{ .chezmoi.hostname }}.org")
+                    "/Entered from {{ .computername }} on/ %U"))
+          ("c" "With context" entry (file "inbox/{{ .computername }}.org")
            ,(concat "* %?\n"
-                    "/Entered from {{ .chezmoi.hostname }} on/ %U\n"
+                    "/Entered from {{ .computername }} on/ %U\n"
                     "  %i\n"
                     "%a"))))
   ;; ("t" "Todo" entry (file+headline "~/Documents/org/capture.org" "Tasks")

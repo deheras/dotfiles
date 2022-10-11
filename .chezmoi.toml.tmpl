@@ -2,9 +2,14 @@
 {{- $hostowner := promptStringOnce . "hostowner" "Machine owner [personal|work]" -}}
 {{- $hosttype := promptStringOnce . "hosttype" "Machine type [pc|server]" -}}
 {{- $gitgpg := promptStringOnce . "gitgpg" "GitHub GPG signing key" -}}
+{{- $computername := .chezmoi.hostname }}
+{{- if (eq .chezmoi.os "darwin") }}
+{{-   $computername = output "scutil" "--get" "ComputerName" | trim }}
+{{- end -}}
 
 [data]
     email = {{ $email | quote }}
     hostowner = {{ $hostowner | quote }}
     hosttype = {{ $hosttype | quote }}
     gitgpg = {{ $gitgpg | quote }}
+    computername = {{ $computername | quote }}
