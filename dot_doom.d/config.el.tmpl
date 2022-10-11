@@ -486,7 +486,9 @@ It also looks at the text of the entry itself."
 ;; docker stuff
 (after! docker
   ;; Associate Containerfile as Dockerfile
-  (add-to-list 'auto-mode-alist '("/Containerfile\\(?:\\.[^/\\]*\\)?\\'" . dockerfile-mode)))
+  (add-to-list 'auto-mode-alist '("/Containerfile\\(?:\\.[^/\\]*\\)?\\'" . dockerfile-mode))
+  (setq dockerfile-use-buildkit t)
+  (setq dockerfile-build-progress "plain"))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
