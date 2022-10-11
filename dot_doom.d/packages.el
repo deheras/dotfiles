@@ -13,6 +13,8 @@
 (package! xterm-color)
 (package! multi-vterm)
 
+;; Unpinning to take advantage of --progress=plain in v1.7
+(unpin! dockerfile-mode)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
