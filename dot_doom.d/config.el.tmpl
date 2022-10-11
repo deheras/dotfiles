@@ -149,27 +149,29 @@ It also looks at the text of the entry itself."
            (type (completing-read "Media type: " type-options))
            (link (call-interactively 'deheras/org-agenda-copy-link))
            (slug (deheras/org-get-bookmark-title-slug title))
-           (path (concat (file-truename "~/Documents/literature/articles/") slug "-" (format-time-string "%Y%m%d%H%M%S") ".pdf"))
+           path
            (cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" link path)))
       (org-with-wide-buffer
-       (with-current-buffer (compile cmd)
-         (add-hook
-          'compilation-finish-functions
-          (lambda (buf status)
-            (if (equal status "finished\n")
-                (progn
-                  (delete-windows-on buf)
-                  (bury-buffer buf)
-                  (message (concat "Successfully saved to " path)))
-              (user-error (concat "Failed to save " path))))
-          nil
-          'local))
        (deheras/org-agenda-set-property "BM_TITLE" title)
        (deheras/org-agenda-set-property "BM_MEDIA_TYPE" type)
        (deheras/org-agenda-set-property "BM_DESCRIPTION" description)
        (deheras/org-agenda-set-property "BM_URL" link)
-       (deheras/org-agenda-set-property "BM_FILE" (concat "file:" path))
        (deheras/org-agenda-set-property "BM_DATE_ADDED" (format-time-string "[%Y-%m-%d %a %H:%M]"))
+       (when (equal "text" type-options)
+         (with-current-buffer (compile cmd)
+           (add-hook
+            'compilation-finish-functions
+            (lambda (buf status)
+              (if (equal status "finished\n")
+                  (progn
+                    (delete-windows-on buf)
+                    (bury-buffer buf)
+                    (message (concat "Successfully saved to " path)))
+                (user-error (concat "Failed to save " path))))
+            nil
+            'local))
+         (setq path (concat (file-truename "~/Documents/literature/articles/") slug "-" (format-time-string "%Y%m%d%H%M%S") ".pdf"))
+         (deheras/org-agenda-set-property "BM_FILE" (concat "file:" path)))
        (org-agenda-set-tags)
        (org-agenda-refile nil `("bookmarks.org" ,(concat org-directory "bookmarks.org") nil) t))))
 
