@@ -151,6 +151,9 @@ export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
 export EDITOR='emacsclient'
 export PATH="$PATH:$HOME/.emacs.d/bin"
 
+# direnv
+eval "$(direnv hook zsh)"
+
 # pyenv config
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 export PYENV_ROOT="$HOME/.pyenv"
