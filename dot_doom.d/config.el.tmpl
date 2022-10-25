@@ -7,7 +7,7 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "Nick de Heras"
-      user-mail-address "{{ .email }}"
+      user-mail-address {{ .email | quote }}
       org-directory (file-truename "~/Documents/org/"))
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
@@ -85,6 +85,8 @@
 
         org-complete-tags-always-offer-all-agenda-tags t
 
+        org-agenda-include-diary t
+
         org-global-properties '(("Effort_ALL" . "0:05 0:15 0:30 1:00 2:00 4:00 8:00 12:00")))
 
   (defun deheras/org-copy-link (&optional arg)
@@ -157,7 +159,8 @@ It also looks at the text of the entry itself."
        (deheras/org-agenda-set-property "BM_DESCRIPTION" description)
        (deheras/org-agenda-set-property "BM_URL" link)
        (deheras/org-agenda-set-property "BM_DATE_ADDED" (format-time-string "[%Y-%m-%d %a %H:%M]"))
-       (when (equal "text" type-options)
+       (deheras/org-agenda-set-property "BM_STATUS" "UNREAD")
+       (when (equal "text" type)
          (with-current-buffer (compile cmd)
            (add-hook
             'compilation-finish-functions
@@ -484,11 +487,41 @@ It also looks at the text of the entry itself."
 (define-obsolete-function-alias 'run-geiser 'geiser "Geiser 0.26")
 
 ;; docker stuff
-(after! docker
+(after! dockerfile-mode
   ;; Associate Containerfile as Dockerfile
   (add-to-list 'auto-mode-alist '("/Containerfile\\(?:\\.[^/\\]*\\)?\\'" . dockerfile-mode))
-  (setq dockerfile-use-buildkit t)
-  (setq dockerfile-build-progress "plain"))
+  (setq dockerfile-use-buildkit t))
+  ;; (setq dockerfile-build-progress "plain"))
+
+(after! diary-lib
+  (setq deheras-diary-location "~/Documents/diary/")
+  ;; calendars you want to download
+  ;; each item links to a remote iCal calendar
+  (setq deheras-diary-calendars
+        '({{ .emacsdiarycals }}))
+
+  (defun deheras/getcal (url file)
+    "Download ics file and add it to file"
+    (let ((tmpfile (url-file-local-copy url)))
+      (icalendar-import-file tmpfile file)
+      (kill-buffer (car (last (split-string tmpfile "/"))))))
+
+  (defun deheras/getcals ()
+    "Load a set of ICS calendars into Emacs diary files"
+    (interactive)
+    (mapcar #'(lambda (x)
+                (let ((file (concat deheras-diary-location (car x)))
+                      (url (cdr x)))
+                  (message (concat "Loading " url " into " file))
+                  (find-file file)
+                  ;; (flush-lines "^[& ]") ;; if you import ical as non marking
+                  (erase-buffer) ;; to avoid duplicating events
+                  (getcal url file)
+                  ))
+            deheras-diary-calendars))
+
+  (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
