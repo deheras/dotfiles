@@ -522,6 +522,12 @@ It also looks at the text of the entry itself."
   (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
   (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files))
 
+(after! project
+  (let ((local (lambda (dir)
+                 (let ((root (locate-dominating-file dir ".projectile")))
+                   (and root (cons 'transient root))))))
+    (add-hook 'project-find-functions local)))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
