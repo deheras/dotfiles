@@ -142,6 +142,35 @@ It also looks at the text of the entry itself."
           (org-fold-show-context 'agenda)
           (funcall-interactively 'org-set-property property value)))))
 
+  (defun deheras/url-text-to-file (url directory filename file-type)
+    (let* ((path (format "%s/%s.%s" directory filename file-type)))
+      (cond ((equal file-type "org")
+             (progn
+               (org-web-tools-read-url-as-org url :show-buffer-fn #'switch-to-buffer-other-window)
+               (setq save (read-string "Save? [y]es|[n]o|[p]df: "))
+               (cond ((equal save "y") (write-file path))
+                     ((equal save "p") (deheras/url-text-to-file url directory filename "pdf"))
+                     ((equal save "n") (message "Opted not to save; exiting"))
+                     (t (user-error (concat "Invalid option: " save))))))
+
+            ((equal file-type "pdf")
+             (progn
+               (setq cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" url path))
+               (with-current-buffer (compile cmd)
+                 (add-hook
+                  'compilation-finish-functions
+                  (lambda (buf status)
+                    (if (equal status "finished\n")
+                        (progn
+                          (delete-windows-on buf)
+                          (bury-buffer buf)
+                          (message (concat "Successfully saved to " path)))
+                      (user-error (concat "Failed to save " path))))
+                  nil
+                  'local))))
+
+            (t (user-error (concat "Invalid file type: " file-type))))
+      path))
 
   (defun deheras/org-agenda-process-inbox-bookmark ()
     "Create bookmark from inbox item."
@@ -153,8 +182,12 @@ It also looks at the text of the entry itself."
            (type (completing-read "Media type: " type-options))
            (link (call-interactively 'deheras/org-agenda-copy-link))
            (slug (deheras/org-get-bookmark-title-slug title))
-           path
-           (cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" link path)))
+           directory
+           (current-window-number (winum-get-number))
+           (filename (concat slug "-" (format-time-string "%Y%m%d%H%M%S")))
+           path)
+           ;; path
+           ;; (cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" link path)))
       (org-with-wide-buffer
        (deheras/org-agenda-set-property "BM_TITLE" title)
        (deheras/org-agenda-set-property "BM_MEDIA_TYPE" type)
@@ -163,19 +196,10 @@ It also looks at the text of the entry itself."
        (deheras/org-agenda-set-property "BM_DATE_ADDED" (format-time-string "[%Y-%m-%d %a %H:%M]"))
        (deheras/org-agenda-set-property "BM_STATUS" "UNREAD")
        (when (equal "text" type)
-         (with-current-buffer (compile cmd)
-           (add-hook
-            'compilation-finish-functions
-            (lambda (buf status)
-              (if (equal status "finished\n")
-                  (progn
-                    (delete-windows-on buf)
-                    (bury-buffer buf)
-                    (message (concat "Successfully saved to " path)))
-                (user-error (concat "Failed to save " path))))
-            nil
-            'local))
-         (setq path (concat (file-truename "~/Documents/literature/articles/") slug "-" (format-time-string "%Y%m%d%H%M%S") ".pdf"))
+         (setq directory (file-truename "~/Documents/literature/articles/"))
+         ;; Default to org. Can go with PDF if I don't like the org output.
+         (setq path (deheras/url-text-to-file link directory filename "org"))
+         (winum-select-window-by-number current-window-number)  ;; Return to previous window
          (deheras/org-agenda-set-property "BM_FILE" (concat "file:" path)))
        (org-agenda-set-tags)
        (org-agenda-refile nil `("bookmarks.org" ,(concat org-directory "bookmarks.org") nil) t))))
@@ -517,7 +541,7 @@ It also looks at the text of the entry itself."
                   (find-file file)
                   ;; (flush-lines "^[& ]") ;; if you import ical as non marking
                   (erase-buffer) ;; to avoid duplicating events
-                  (getcal url file)
+                  (deheras/getcal url file)
                   ))
             deheras-diary-calendars))
 
@@ -529,6 +553,26 @@ It also looks at the text of the entry itself."
                  (let ((root (locate-dominating-file dir ".projectile")))
                    (and root (cons 'transient root))))))
     (add-hook 'project-find-functions local)))
+
+(use-package! org-web-tools
+  :custom
+  (org-web-tools-archive-wget-options
+   '("--ignore-tags=script,iframe"
+     "--reject=eot,ttf,svg,otf,*.woff*"
+     "--execute"
+     "robots=off"
+     "--adjust-extension"
+     "--span-hosts"
+     "--convert-links"
+     "--page-requisites"
+     "--timestamping"
+     "--no-directories"))
+  (org-web-tools-archive-wget-html-only-options
+   '("--execute"
+     "robots=off"
+     "--adjust-extension"
+     "--timestamping"
+     "--no-directories")))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;

@@ -12,6 +12,7 @@
 (package! nov)
 (package! xterm-color)
 (package! multi-vterm)
+(package! org-web-tools)
 
 ;; Unpinning to take advantage of --progress=plain in v1.7
 (unpin! dockerfile-mode)
