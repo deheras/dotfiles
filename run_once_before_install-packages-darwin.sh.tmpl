@@ -11,6 +11,8 @@ tap "homebrew/core"
 tap "railwaycat/emacsmacport"
 {{- if eq .hostowner "personal" }}
 tap "ngrok/ngrok"
+{{- else if eq .hostowner "work"}}
+tap "hashicorp/tap"
 {{- end}}
 
 # Packages
@@ -19,15 +21,20 @@ brew "xz"
 brew "glib"
 brew "chezmoi"
 brew "cmake"
+brew "colima"
+brew "cookiecutter"
 brew "coreutils"
 brew "direnv"
 brew "fd"
+brew "fontconfig"
 brew "unbound"
 brew "gnutls"
 brew "harfbuzz"
 brew "ffmpeg"
 brew "findutils"
+brew "gawk"                 # a better awk
 brew "gcc"
+brew "gdb"                  # emacs debugger
 brew "gh"
 brew "gnupg"
 brew "grip"
@@ -35,6 +42,8 @@ brew "pango"
 brew "librsvg"
 brew "graphviz"
 brew "htop"
+brew "jq"                   # json processor
+brew "libvterm"             # requirement for vterm
 brew "nmap"
 brew "openssl@3"
 brew "pandoc"
@@ -50,26 +59,51 @@ brew "ripgrep"
 brew "shellcheck"
 brew "smartmontools"
 brew "subversion"
+brew "telnet"
 brew "tmux"
 brew "tree"
 brew "wget"
 brew "z"
 brew "zlib"
 brew "zsh-syntax-highlighting"
+brew "eth-p/software/bat-extras"
 brew "railwaycat/emacsmacport/emacs-mac", args: ["with-native-comp", "without-modules", "with-dbus", "with-emacs-big-sur-icon"]
 {{- if eq .hostowner "personal" }}
 brew "minimal-racket"
 brew "twilio/brew/twilio"
 {{- else if eq .hostowner "work" }}
+brew "csvkit"
+brew "dos2unix"
 brew "gimme-aws-creds"
+brew "lastpass-cli"
+brew "notmuch"
+brew "postgresql@12", restart_service: true
+brew "pre-commit"
+brew "r"
+brew "sphinx-doc"
+brew "terraform-docs"
+brew "terrascan"
+brew "tflint"
+brew "tfsec"
+brew "hashicorp/tap/terraform"
+brew "hashicorp/tap/terraform-ls"
 {{- end }}
 
 # Casks
+cask "dbeaver-community"
+cask "firefox"
 cask "font-ibm-plex-serif"
 cask "font-source-code-pro"
 cask "wkhtmltopdf"
 {{- if eq .hostowner "personal" }}
 cask "ngrok"
+{{- else if eq .hostowner "work" }}
+cask "amazon-workspaces"
+cask "lastpass"
+cask "openvpn-connect"
+cask "pgadmin4"
+cask "rstudio"
+cask "slack"
 {{- end}}
 EOF
 {{ end -}}
