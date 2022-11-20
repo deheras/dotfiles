@@ -1,13 +1,16 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
 # Taps
 tap "eth-p/software"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
-{{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
-tap "ngrok/ngrok"
 tap "railwaycat/emacsmacport"
-tap "twilio/brew"
+{{- if eq .hostowner "personal" }}
+tap "ngrok/ngrok"
 {{- end}}
 
 # Packages
@@ -24,6 +27,7 @@ brew "gnutls"
 brew "harfbuzz"
 brew "ffmpeg"
 brew "findutils"
+brew "gcc"
 brew "gh"
 brew "gnupg"
 brew "grip"
@@ -41,26 +45,31 @@ brew "podman"
 brew "pre-commit"
 brew "pyenv"
 brew "pyenv-virtualenv"
+brew "qemu"
 brew "ripgrep"
 brew "shellcheck"
 brew "smartmontools"
 brew "subversion"
 brew "tmux"
 brew "tree"
+brew "wget"
 brew "z"
 brew "zlib"
 brew "zsh-syntax-highlighting"
 brew "railwaycat/emacsmacport/emacs-mac", args: ["with-native-comp", "without-modules", "with-dbus", "with-emacs-big-sur-icon"]
-{{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
+{{- if eq .hostowner "personal" }}
 brew "minimal-racket"
 brew "twilio/brew/twilio"
-{{ else if eq .hostowner "work" }}
+{{- else if eq .hostowner "work" }}
 brew "gimme-aws-creds"
 {{- end }}
 
 # Casks
 cask "font-ibm-plex-serif"
 cask "font-source-code-pro"
-{{- if (and (eq .chezmoi.os "darwin") (eq .hostowner "personal")) }}
+cask "wkhtmltopdf"
+{{- if eq .hostowner "personal" }}
 cask "ngrok"
 {{- end}}
+EOF
+{{ end -}}
