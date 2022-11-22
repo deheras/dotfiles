@@ -8,7 +8,7 @@
 ;; clients, file templates and snippets.
 (setq user-full-name "Nick de Heras"
       user-mail-address {{ .email | quote }}
-      org-directory (file-truename "~/Documents/org/"))
+      org-directory (file-truename {{ .org_directory | quote }}))
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:

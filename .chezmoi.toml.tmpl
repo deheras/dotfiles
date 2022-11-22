@@ -6,6 +6,8 @@
 {{- if (eq .chezmoi.os "darwin") }}
 {{-   $computername = output "scutil" "--get" "ComputerName" | trim }}
 {{- end -}}
+{{- $org_directory := promptStringOnce . "org_directory" "Org directory" }}
+{{- $emacsdiarycals := promptStringOnce . "emacsdiarycals" "Emacs diary cals"}}
 
 [data]
     email = {{ $email | quote }}
@@ -13,3 +15,5 @@
     hosttype = {{ $hosttype | quote }}
     gitgpg = {{ $gitgpg | quote }}
     computername = {{ $computername | quote }}
+    org_directory = {{ $org_directory | quote }}
+    emacsdiarycals = {{ $emacsdiarycals | quote }}
