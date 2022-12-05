@@ -4,6 +4,6 @@ debugpy
 isort
 ipython
 pylint
-"python-lsp-server[all]"
+python-lsp-server[all]
 pylsp-mypy
 python-lsp-black

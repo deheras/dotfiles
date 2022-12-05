@@ -84,7 +84,7 @@ ZSH_CUSTOM=$HOME/.omz_custom
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git pip pyenv brew zsh-autosuggestions zsh-syntax-highlighting poetry aws dotenv)
+plugins=(git pip pyenv brew aws dotenv)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -141,6 +141,8 @@ eval "$(brew shellenv)"
 export PATH="$PATH:${HOMEBREW_PREFIX}/opt/openssl@3/bin"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 . ${HOMEBREW_PREFIX}/etc/profile.d/z.sh
+source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 {{- if eq .hostowner "personal" }}
 export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
 {{- end }}
@@ -163,3 +165,4 @@ eval "$(pyenv virtualenv-init -)"
 {{- else }}
 export EDITOR='vim'
 {{- end }}
+
