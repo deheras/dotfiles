@@ -185,6 +185,7 @@ It also looks at the text of the entry itself."
            directory
            (current-window-number (winum-get-number))
            (filename (concat slug "-" (format-time-string "%Y%m%d%H%M%S")))
+           file-type
            path)
            ;; path
            ;; (cmd (format "wkhtmltopdf -n \"%s\" \"%s\"" link path)))
@@ -196,9 +197,10 @@ It also looks at the text of the entry itself."
        (deheras/org-agenda-set-property "BM_DATE_ADDED" (format-time-string "[%Y-%m-%d %a %H:%M]"))
        (deheras/org-agenda-set-property "BM_STATUS" "UNREAD")
        (when (equal "text" type)
-         (setq directory (file-truename "~/Documents/literature/articles/"))
+         (setq file-type (read-string "Archive as type (org pdf): "))
+         (setq directory (file-truename "~/Documents/literature/articles"))
          ;; Default to org. Can go with PDF if I don't like the org output.
-         (setq path (deheras/url-text-to-file link directory filename "org"))
+         (setq path (deheras/url-text-to-file link directory filename file-type))
          (winum-select-window-by-number current-window-number)  ;; Return to previous window
          (deheras/org-agenda-set-property "BM_FILE" (concat "file:" path)))
        (org-agenda-set-tags)
