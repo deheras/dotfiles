@@ -83,6 +83,11 @@
         org-default-priority ?C
         org-lowest-priority ?D
 
+        org-priority-faces '((?A . (:foreground "#e45649" :weight bold))
+                             (?B . (:foreground "#f1c232"))
+                             (?C . (:foreground "#93c47d"))
+                             (?D . (:foreground "#898989"))))
+
         org-complete-tags-always-offer-all-agenda-tags t
 
         org-agenda-include-diary t
@@ -311,7 +316,7 @@ It also looks at the text of the entry itself."
         `(
           ("d" "Default agenda"
            ((agenda ""
-                    ((org-agenda-span 7)
+                    ((org-agenda-span 1)
                      (org-agenda-start-day "-0d")
                      (org-deadline-warning-days 90)))
             (tags "inbox"
