@@ -124,7 +124,8 @@ export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/.poetry/bin"
 
 # Set tab for autocompletions
-bindkey '^[[Z' autosuggest-accept
+# bindkey '^[[Z' autosuggest-accept
+bindkey '^ ' autosuggest-accept
 
 export GPG_TTY=$(tty)
 
@@ -166,3 +167,4 @@ eval "$(pyenv virtualenv-init -)"
 export EDITOR='vim'
 {{- end }}
 
+autoload -Uz compinit && compinit
