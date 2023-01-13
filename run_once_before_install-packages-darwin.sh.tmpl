@@ -46,6 +46,7 @@ brew "librsvg"
 brew "graphviz"
 brew "htop"
 brew "jq"                   # json processor
+brew "just"                 # just a command runner
 brew "libvterm"             # requirement for vterm
 brew "nmap"
 brew "openssl@3"
@@ -109,7 +110,7 @@ cask "ngrok"
 {{- else if eq .hostowner "work" }}
 cask "amazon-workspaces"
 cask "lastpass"
-# cask "openvpn-connect"
+cask "openvpn-connect"
 cask "pgadmin4"
 cask "rstudio"
 cask "slack"

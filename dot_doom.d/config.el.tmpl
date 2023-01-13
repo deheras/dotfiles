@@ -434,9 +434,9 @@ It also looks at the text of the entry itself."
   ;; For python
   (setq dap-python-debugger 'debugpy))
 
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
-               '(python-mode . ("ruff-lsp"))))
+;; (with-eval-after-load 'eglot
+;;   (add-to-list 'eglot-server-programs
+;;                '(python-mode . ("ruff-lsp"))))
   ;; General
   ;; Open hydra buffer when breakpoint hit
   ;; (add-hook 'dap-stopped-hook
