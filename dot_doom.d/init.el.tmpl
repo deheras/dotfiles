@@ -79,6 +79,7 @@
        emacs-lisp
        (json +tree-sitter)
        (markdown +grip)
+       nix
        (org +journal +pomodoro +roam2 +noter)
        (python +lsp +poetry +tree-sitter)
        rst               ; ReST in peace
@@ -86,7 +87,6 @@
        (web +tree-sitter)
        yaml
        {{- if eq .hostowner "personal" }}
-       nix
        (racket +lsp)
        (scheme +guile)
        {{- else if eq .hostowner "work" }}

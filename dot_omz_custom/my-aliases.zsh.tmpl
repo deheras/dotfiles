@@ -29,8 +29,5 @@ alias ql='qlmanage -p'
 {{- end }}
 {{ if (and (eq .hostowner "work") (eq .hosttype "pc")) }}
 # Work stuff
-alias tunnel='~/Documents/projects/ap-advanced-analytics/tools/command-line-utils/ssh-tunnel/ssh_tunnel.sh'
-alias kdrive='open smb://crossix.local/data/'
-alias aarepo='~/Documents/projects/ap-advanced-analytics/'
-alias awsdevops='gimme-aws-creds --profile devops'
+alias kubectl="minikube kubectl --"
 {{- end }}
