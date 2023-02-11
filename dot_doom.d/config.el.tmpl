@@ -514,8 +514,11 @@ It also looks at the text of the entry itself."
 (after! company
   (setq company-idle-delay 0.5))
 
+;; notmuch config
 (setq +notmuch-home-function (lambda () (notmuch-search "tag:inbox")))
 (setq +notmuch-sync-backend (concat "cd " +notmuch-mail-folder " && notmuch new"))
+(after! notmuch
+  (setq notmuch-archive-tags '("-inbox" "-unread" "-new")))
 
 ;; Patch for geiser regression (2022-10-01)
 ;; https://github.com/emacsmirror/geiser/blob/486c39cfbdf1789fe493535b7e0ae72ff518e53e/elisp/geiser-repl.el
