@@ -175,3 +175,6 @@ autoload -Uz compinit && compinit
 # Install useful fzf keybindings and fuzzy completion
 # https://github.com/junegunn/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# kubectl autocompletion
+[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
