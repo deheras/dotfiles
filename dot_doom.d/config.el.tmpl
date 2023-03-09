@@ -387,6 +387,13 @@ It also looks at the text of the entry itself."
   ;; Org Roam
   (setq org-roam-directory (concat org-directory "roam/"))
 
+  ;; org-roam-dailies templates
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry
+           "* %<%H:%M> %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))))
+
   ;; This determines the style of line numbers in effect. If set to `nil', line
   ;; numbers are disabled. For relative line numbers, set this to `relative'.
   (setq display-line-numbers-type 'relative)
