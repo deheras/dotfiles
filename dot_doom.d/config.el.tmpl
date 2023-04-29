@@ -519,7 +519,7 @@ It also looks at the text of the entry itself."
     '(model-line-inactive :family "Source Code Pro" :size 10)))
 
 (after! company
-  (setq company-idle-delay 0.5))
+  (setq company-idle-delay 0.2))
 
 ;; notmuch config
 (setq +notmuch-home-function (lambda () (notmuch-search "tag:inbox")))

@@ -86,12 +86,12 @@
        rst               ; ReST in peace
        (sh +tree-sitter)
        (web +tree-sitter)
-       yaml
+       (yaml +lsp +tree-sitter)
        {{- if eq .hostowner "personal" }}
        (racket +lsp)
        (scheme +guile)
        {{- else if eq .hostowner "work" }}
-       (ess +lsp)
+       (ess +lsp +tree-sitter)
        {{- end }}
 
        :email
