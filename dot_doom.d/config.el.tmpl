@@ -599,6 +599,10 @@ It also looks at the text of the entry itself."
   (add-hook 'elfeed-show-mode-hook
             (lambda () (buffer-face-set 'variable-pitch))))
 
+(after! yaml-mode
+  (set-formatter!
+    'prettier "prettier --parser yaml --no-bracket-spacing"))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
