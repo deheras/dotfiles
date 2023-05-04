@@ -523,7 +523,7 @@ It also looks at the text of the entry itself."
 
 ;; notmuch config
 (setq +notmuch-home-function (lambda () (notmuch-search "tag:inbox")))
-(setq +notmuch-sync-backend (concat "cd " +notmuch-mail-folder " && notmuch new"))
+(setq +notmuch-sync-backend (concat "cd " +notmuch-mail-folder " && docker container run --rm -v /Users/nickdeheras/.mail/account.gmail:/nm/.mail/account.gmail -v /Users/nickdeheras/.mail/.notmuch:/nm/.mail/.notmuch -w /nm/.mail/account.gmail notmuch-lieer:1.4 notmuch new"))
 (after! notmuch
   (setq notmuch-archive-tags '("-inbox" "-unread" "-new")))
 
