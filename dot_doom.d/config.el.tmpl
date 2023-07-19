@@ -597,7 +597,9 @@ It also looks at the text of the entry itself."
 (after! elfeed
   ;; https://github.com/skeeto/elfeed/issues/190
   (add-hook 'elfeed-show-mode-hook
-            (lambda () (buffer-face-set 'variable-pitch))))
+            (lambda () (buffer-face-set 'variable-pitch)))
+  (setq-default elfeed-search-filter "@2-days-ago +unread "))
+
 
 (after! yaml-mode
   (set-formatter!
