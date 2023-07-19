@@ -2,12 +2,13 @@
 {{- $hostowner := promptStringOnce . "hostowner" "Machine owner [personal|work]" -}}
 {{- $hosttype := promptStringOnce . "hosttype" "Machine type [pc|server]" -}}
 {{- $gitgpg := promptStringOnce . "gitgpg" "GitHub GPG signing key" -}}
-{{- $computername := .chezmoi.hostname }}
+{{- $computername := .chezmoi.hostname -}}
 {{- if (eq .chezmoi.os "darwin") }}
-{{-   $computername = output "scutil" "--get" "ComputerName" | trim }}
+{{-   $computername = output "scutil" "--get" "ComputerName" | trim -}}
 {{- end -}}
-{{- $org_directory := promptStringOnce . "org_directory" "Org directory" }}
-{{- $emacsdiarycals := promptStringOnce . "emacsdiarycals" "Emacs diary cals"}}
+{{- $org_directory := promptStringOnce . "org_directory" "Org directory" -}}
+{{- $emacsdiarycals := promptStringOnce . "emacsdiarycals" "Emacs diary cals" -}}
+{{- $dev_level := promptStringOnce . "dev_level" "Machine dev level (1 is highest)" -}}
 
 [data]
     email = {{ $email | quote }}
@@ -17,3 +18,4 @@
     computername = {{ $computername | quote }}
     org_directory = {{ $org_directory | quote }}
     emacsdiarycals = {{ $emacsdiarycals | quote }}
+    dev_level = {{ $dev_level }}
