@@ -90,6 +90,7 @@
        {{- if eq .hostowner "personal" }}
        (racket +lsp)
        (scheme +guile)
+       (rust +lsp +tree-sitter)
        {{- else if eq .hostowner "work" }}
        (ess +lsp +tree-sitter)
        {{- end }}
