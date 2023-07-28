@@ -12,21 +12,29 @@ tap "homebrew/core"
 tap "railwaycat/emacsmacport"
 {{- if eq .hostowner "personal" }}
 tap "ngrok/ngrok"
-{{- else if eq .hostowner "work"}}
+{{- else if eq .hostowner "work" }}
 tap "hashicorp/tap"
-{{- end}}
+{{- end -}}
 
 # Packages
+{{- if eq .dev_level 1 }}
+brew "derailed/k9s/k9s"
+brew "docker"
+brew "docker-compose"
+brew "helm"
+brew "helmfile"
+brew "kubectl"
+brew "kubeseal"
+brew "podman"
+brew "minikube"
+{{- end }}
 brew "bat"
 brew "chezmoi"
 brew "cmake"
 brew "colima"
 brew "cookiecutter"
 brew "coreutils"
-brew "derailed/k9s/k9s"
 brew "direnv"
-brew "docker"
-brew "docker-compose"
 brew "fd"
 brew "ffmpeg"
 brew "findutils"
@@ -45,13 +53,9 @@ brew "graphviz"
 brew "grep"
 brew "grip"
 brew "harfbuzz"
-brew "helm"
-brew "helmfile"
 brew "htop"
 brew "jq"                   # json processor
 brew "just"                 # just a command runner
-brew "kubectl"
-brew "kubeseal"
 brew "librsvg"
 brew "libvterm"             # requirement for vterm
 brew "nmap"
@@ -66,7 +70,6 @@ brew "python@3.10"
 brew "tcl-tk"               # pyenv needs this
 brew "unbound"
 brew "xz"
-brew "podman"
 brew "pre-commit"
 brew "pv"
 brew "pyenv"
@@ -96,7 +99,6 @@ brew "awscli"
 brew "csvkit"
 brew "dos2unix"
 brew "gimme-aws-creds"
-brew "minikube"
 brew "notmuch"
 brew "postgresql@12", restart_service: true
 brew "pre-commit"
@@ -111,7 +113,9 @@ brew "hashicorp/tap/terraform-ls"
 {{- end }}
 
 # Casks
+{{- if eq .dev_level 1 }}
 cask "dbeaver-community"
+{{- end }}
 cask "firefox"
 cask "font-ibm-plex-serif"
 cask "font-source-code-pro"
@@ -126,6 +130,6 @@ cask "openvpn-connect"
 cask "pgadmin4"
 cask "rstudio"
 cask "slack"
-{{- end}}
+{{- end }}
 EOF
-{{ end -}}
+{{- end }}
