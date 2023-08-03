@@ -605,6 +605,10 @@ It also looks at the text of the entry itself."
   (set-formatter!
     'prettier "prettier --parser yaml --no-bracket-spacing"))
 
+(after! json-mode
+  (set-formatter!
+    'prettier "prettier --parser json --no-bracket-spacing --trailing-comma none --no-semi --tab-width 4"))
+
 ;; Manual flycheck ruff support until it's added into flycheck
 (require 'flycheck)
 (flycheck-define-checker python-ruff
