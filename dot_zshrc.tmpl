@@ -84,7 +84,17 @@ ZSH_CUSTOM=$HOME/.omz_custom
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git pip pyenv brew aws dotenv)
+plugins=(
+    git
+    pip
+    pyenv
+    brew
+    dotenv
+{{- if eq .dev_level 1 }}
+    aws
+    kube-ps1
+{{- end }}
+)
 
 # 2023-01-12 add just autocompletion support
 fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
@@ -151,6 +161,10 @@ export PATH="$PATH:$HOMEBREW_CELLAR/minimal-racket/8.5/bin"
 {{- else}}
 # Terraform config
 complete -o nospace -C /usr/local/bin/terraform terraform
+# The next line updates PATH for egcli command.
+if [ -f "${HOME}/Library/Group Containers/FELUD555VC.group.com.egnyte.DesktopApp/CLI/egcli.inc" ]; then . "${HOME}/Library/Group Containers/FELUD555VC.group.com.egnyte.DesktopApp/CLI/egcli.inc"; fi
+# Setup aws-login
+[[ ! -f ~/.aws-login.bash ]] || source ~/.aws-login.bash
 {{- end }}
 {{- end }}
 
@@ -169,13 +183,16 @@ command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-# kubectl autocompletion
-[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
-
 {{- else }}
 
 export EDITOR='vim'
 
+{{- end }}
+
+{{- if eq .dev_level 1 }}
+# kubectl autocompletion
+[[ $commands[kubectl] ]] && source <(kubectl completion zsh)
+PROMPT='$(kube_ps1)'$PROMPT # or RPROMPT='$(kube_ps1)'
 {{- end }}
 
 # Install useful fzf keybindings and fuzzy completion
@@ -198,3 +215,4 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
 
 autoload -U +X bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
+
