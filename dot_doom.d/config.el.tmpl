@@ -352,8 +352,17 @@ It also looks at the text of the entry itself."
             (org-agenda-overriding-header "Week in review")
             (org-agenda-span 'week)
             (org-agenda-start-on-weekday 0)
-            )
-           )))
+            ))
+          ("b" "Bookmarks"
+           ((tags "-reference-toread"
+                  ((org-agenda-overriding-header "Unfiled")
+                   (org-agenda-files `(,(expand-file-name "bookmarks.org" org-directory)))))
+            (tags "+toread"
+                  ((org-agenda-overriding-header "Reading List")
+                   (org-agenda-files `(,(expand-file-name "bookmarks.org" org-directory)))))
+            (tags "+reference"
+                  ((org-agenda-overriding-header "Reference")
+                   (org-agenda-files `(,(expand-file-name "bookmarks.org" org-directory)))))))))
 
   ;; Weekly review
   ;; (add-to-list org-agenda-custom-commands
@@ -391,6 +400,10 @@ It also looks at the text of the entry itself."
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
            "* %<%H:%M> %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d>\n"))
+          ("y" "yesterday" entry
+           "* 23:59 %?"
            :target (file+head "%<%Y-%m-%d>.org"
                               "#+title: %<%Y-%m-%d>\n"))))
 
