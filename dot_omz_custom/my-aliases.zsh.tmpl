@@ -1,28 +1,22 @@
 # General
-alias q='exit'
-alias c='clear'
-alias h='history'
 alias cs='clear;ls'
 alias lsa='ls -a'
 alias lsl='ls -l'
 alias lsla='ls -l -a'
 alias t='time'
-alias home='cd ~'
 alias root='cd /'
-alias o=open
 alias ..='cd ..'
 alias ...='cd ..; cd ..'
 alias ....='cd ..; cd ..; cd ..'
-alias vimrc='vim ~/.vimrc'
-alias zshrc='vim ~/.zshrc'
 alias fresh='exec "$SHELL"'
 
 # python
 alias dj='python manage.py'
-alias pipemacs='pip install -r $HOME/.doom.d/requirements-emacs.txt'
 
+{{- if eq .dev_level 1 }}
 # k8s
 alias k=kubectl
+{{- end}}
 
 # chezmoi
 alias cm='chezmoi'
@@ -33,4 +27,5 @@ alias ql='qlmanage -p'
 {{ if (and (eq .hostowner "work") (eq .hosttype "pc")) }}
 # Work stuff
 # alias kubectl="minikube kubectl --"
+alias tf='terraform'
 {{- end }}
