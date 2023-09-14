@@ -328,12 +328,9 @@ It also looks at the text of the entry itself."
             (todo "TODO"
                   ((org-agenda-overriding-header "One-off Tasks")
                    (org-agenda-files `(,(expand-file-name "gtd/next.org" org-directory)))))
-            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))
             (todo "WAITING"
                   ((org-agenda-overriding-header "Waiting")
-                   (org-agenda-files `(,(expand-file-name "gtd/projects.org" org-directory)))))
-            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))
-            ))
+                   (org-agenda-files `(,(expand-file-name "gtd/" org-directory)))))))
           ("rw" "Weekly review"
            agenda ""
            (
