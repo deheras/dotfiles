@@ -10,6 +10,7 @@ alias ...='cd ..; cd ..'
 alias ....='cd ..; cd ..; cd ..'
 alias fresh='exec "$SHELL"'
 alias da='direnv allow .'
+alias trs='tr -d "[:space:]"'
 
 # python
 alias dj='python manage.py'
@@ -24,6 +25,8 @@ alias cm='chezmoi'
 {{ if eq .chezmoi.os "darwin" }}
 # Mac stuff
 alias ql='qlmanage -p'
+alias up='softwareupdate'
+alias nq='networkQuality'
 {{- end }}
 {{ if (and (eq .hostowner "work") (eq .hosttype "pc")) }}
 # Work stuff
